@@ -620,7 +620,7 @@
                                         <ul class="list-unstyled bg-light p-3 rounded mb-0">
                                             <li class="mb-2"><strong>λ (Laju Kedatangan)</strong> = 1 ÷
                                                 {{ results.input_arrival }} <br> → <span class="formula">λ =
-                                                    {{ results.lam }}; //} pelanggan/menit</span></li>
+                                                    {{ results.lam }} pelanggan/menit</span></li>
                                             <li><strong>μ (Laju Pelayanan)</strong> = 1 ÷ {{ results.input_service }}
                                                 <br>
                                                 → <span class="formula">μ = {{ results.mu }} pelanggan/menit</span>
@@ -635,8 +635,8 @@
                                         <p class="mb-1 text-muted small">Mengukur seberapa sibuk kedua pelayan.</p>
                                         <div class="bg-light p-3 rounded">
                                             Rumus: <span class="formula">ρ = λ ÷ (2 × μ)</span><br><br>
-                                            Substitusi: ρ = {{ results.lam }}; //} ÷ (2 × {{ results.mu }})<br>
-                                            Hitung: ρ = {{ results.lam }}; //} ÷ {{ results.calc_2mu }}<br>
+                                            Substitusi: ρ = {{ results.lam }} ÷ (2 × {{ results.mu }})<br>
+                                            Hitung: ρ = {{ results.lam }} ÷ {{ results.calc_2mu }}<br>
                                             <strong>Hasil: ρ = {{ results.rho }} (atau {{ results.rho_percent
                                                 }}%)</strong>
                                         </div>
@@ -650,7 +650,7 @@
                                         </p>
                                         <div class="bg-light p-3 rounded">
                                             Rumus: <span class="formula">W = 1 ÷ (μ - (λ ÷ 2))</span><br><br>
-                                            Substitusi: W = 1 ÷ ({{ results.mu }} - ({{ results.lam }}; //} ÷ 2))<br>
+                                            Substitusi: W = 1 ÷ ({{ results.mu }} - ({{ results.lam }} ÷ 2))<br>
                                             Proses: W = 1 ÷ ({{ results.mu }} - {{ (results.lam / 2)|round(4) }})<br>
                                             Proses: W = 1 ÷ {{ results.calc_denom }}<br>
                                             <strong>Hasil: W = {{ results.w }} Menit</strong>
@@ -664,7 +664,7 @@
                                         <p class="mb-1 text-muted small">Waktu pelanggan menunggu sebelum dipanggil.</p>
                                         <div class="bg-light p-3 rounded">
                                             Rumus: <span class="formula">Wq = λ² ÷ [2μ(μ - λ/2)]</span><br><br>
-                                            Pembilang (Atas): {{ results.lam }}; //}² = {{ results.lam_sq }}<br>
+                                            Pembilang (Atas): {{ results.lam }}² = {{ results.lam_sq }}<br>
                                             Penyebut (Bawah): 2({{ results.mu }}) × ({{ results.calc_denom }}) = {{
                                             (results.calc_2mu * results.calc_denom)|round(5) }}<br>
                                             Hitung: Wq = {{ results.lam_sq }} ÷ {{ (results.calc_2mu *
@@ -680,12 +680,12 @@
                                         <div class="bg-light p-3 rounded">
                                             <p class="mb-2">
                                                 <strong>L (Jumlah orang di sistem):</strong> λ × W <br>
-                                                {{ results.lam }}; //} × {{ results.w }} = <strong>{{ results.l }}
+                                                {{ results.lam }} × {{ results.w }} = <strong>{{ results.l }}
                                                     Orang</strong>
                                             </p>
                                             <p class="mb-0">
                                                 <strong>Lq (Jumlah orang antri):</strong> λ × Wq <br>
-                                                {{ results.lam }}; //} × {{ results.wq }} = <strong>{{ results.lq }}
+                                                {{ results.lam }} × {{ results.wq }} = <strong>{{ results.lq }}
                                                     Orang</strong>
                                             </p>
                                         </div>
@@ -747,7 +747,7 @@
                                                             class="fas fa-dot-circle text-warning me-1"></i> Titik
                                                         Kuning:</strong> Posisi sistem Anda saat ini berdasarkan input
                                                     yang Anda masukkan. Titik ini menunjukkan di mana λ
-                                                    ({{ results.lam }}; //}) memotong kurva M/M/2 pada waktu W ({{ results.w
+                                                    ({{ results.lam }}) memotong kurva M/M/2 pada waktu W ({{ results.w
                                                     }}).
                                                 </p>
                                                 <p class="mb-0 mt-2 text-muted italic"><em>Catatan: Menambahkan 1
@@ -813,7 +813,8 @@
                         <h5 class="alert-heading fw-bold"><i class="fas fa-skull-crossbones me-2"></i>Sistem Tidak
                             Stabil!</h5>
                         <p class="mb-0">Jika hanya menggunakan 1 pelayan (M/M/1), antrian akan menjadi tak terhingga
-                            karena Laju Kedatangan (λ={{ results.lam }}; //}) mendekati atau melebihi Kapasitas Pelayanan
+                            karena Laju Kedatangan (λ={{ results.lam }}; //}) mendekati atau melebihi Kapasitas
+                            Pelayanan
                             (μ={{ results.mu }}).</p>
                     </div>
                     {% endif %}
@@ -823,7 +824,8 @@
         </div>
         {% endif %}
 
-        <footer class="text-center mt-5" style="font-size: 0.8rem; color: var(--text-dark); opacity: 0.6;">
+        <footer class="text-center mt-5"
+            style="font-size: 0.8rem; color: var(--text-dark); opacity: 0.6; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%; padding: 0 15px;">
             <p class="mb-0 fw-bold">Tugas Pemodelan & Simulasi</p>
             <small>Aplikasi Flask - Model M/M/2 dengan Pilihan M/M/1</small>
         </footer>
@@ -894,9 +896,8 @@
         try {
             const ctx = document.getElementById('performanceChart').getContext('2d');
             const currentLambda = {{ results.lam }};
-
-
         const mu = {{ results.mu }};
+        const currentW = {{ results.w }};
 
         const labels = [];
         const dataMM2 = [];
@@ -939,38 +940,36 @@
                     },
                     {
                         label: 'Posisi Saat Ini',
-                        data: labels.map(l => (Math.abs(parseFloat(l) - currentLambda) < step * 0.6) ? {{ results.w }} : null),
-            borderColor: '#f1c40f',
-                backgroundColor: '#f1c40f',
-                    pointRadius: 6,
+                        data: labels.map(l => (Math.abs(parseFloat(l) - currentLambda) < step * 0.6) ? currentW : null),
+                        borderColor: '#f1c40f',
+                        backgroundColor: '#f1c40f',
+                        pointRadius: 6,
                         pointHoverRadius: 8,
-                            showLine: false
-                        }
-                    ]
-                },
-        options: {
-            responsive: true,
+                        showLine: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
                 maintainAspectRatio: false,
-                    interaction: {
-                intersect: false,
+                interaction: {
+                    intersect: false,
                     mode: 'index'
-            },
-            scales: {
-                x: {
-                    title: { display: true, text: 'Laju Kedatangan (λ)' }
                 },
-                y: {
-                    title: { display: true, text: 'Waktu (W)' },
-                    suggestedMax: {{ results.w * 2 }}
-
-
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Laju Kedatangan (λ)' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Waktu (W)' },
+                        suggestedMax: currentW * 2
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
                 }
-            },
-            plugins: {
-                legend: { display: false }
             }
-        }
-            });
+        });
 
         updateChartTheme();
         } catch (e) {
