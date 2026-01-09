@@ -403,6 +403,59 @@
             height: 300px;
             width: 100%;
         }
+
+        /* --- MOBILE OPTIMIZATIONS --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+
+            .glass-container {
+                padding: 25px 20px;
+                border-radius: 20px;
+            }
+
+            h2 {
+                font-size: 1.5rem !important;
+            }
+
+            .metric-val {
+                font-size: 1.4rem;
+            }
+
+            .metric-card {
+                padding: 15px 10px;
+            }
+
+            .btn-modern {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .nav-pills .nav-link {
+                font-size: 0.85rem;
+                padding: 8px 12px;
+                margin-right: 5px;
+                margin-bottom: 5px;
+            }
+
+            .theme-toggle {
+                top: 15px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            .metric-card.flex-row {
+                flex-direction: column !important;
+                text-align: center !important;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 
@@ -488,7 +541,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-6 col-md-6">
                             <div class="metric-card border-bottom border-primary border-4">
                                 <div class="metric-val">{{ results.w }}</div>
                                 <div class="metric-label">
@@ -500,7 +553,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-6 col-md-6">
                             <div class="metric-card border-bottom border-info border-4">
                                 <div class="metric-val">{{ results.wq }}</div>
                                 <div class="metric-label">
@@ -513,7 +566,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-6 col-md-6">
                             <div class="metric-card">
                                 <div class="metric-val" style="color: var(--text-dark);">{{ results.l }}</div>
                                 <div class="metric-label">
@@ -525,7 +578,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-6 col-md-6">
                             <div class="metric-card">
                                 <div class="metric-val" style="color: var(--text-dark);">{{ results.lq }}</div>
                                 <div class="metric-label">
@@ -717,25 +770,25 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-6 col-md-3">
                             <div class="metric-card border-top border-danger border-4">
                                 <div class="metric-val text-danger fs-3">{{ mm1_results.w }}</div>
                                 <div class="metric-label" style="font-size: 0.7rem;">W (Sistem)</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-6 col-md-3">
                             <div class="metric-card border-top border-danger border-4">
                                 <div class="metric-val text-danger fs-3">{{ mm1_results.wq }}</div>
                                 <div class="metric-label" style="font-size: 0.7rem;">Wq (Antrian)</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-6 col-md-3">
                             <div class="metric-card">
                                 <div class="metric-val fs-3">{{ mm1_results.l }}</div>
                                 <div class="metric-label" style="font-size: 0.7rem;">L (Org)</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-6 col-md-3">
                             <div class="metric-card">
                                 <div class="metric-val fs-3">{{ mm1_results.lq }}</div>
                                 <div class="metric-label" style="font-size: 0.7rem;">Lq (Org)</div>
@@ -906,7 +959,7 @@
                 },
                 y: {
                     title: { display: true, text: 'Waktu (W)' },
-                    suggestedMax: {{ results.w * 2 }}
+                    suggestedMax: { { results.w * 2 } }
                 }
             },
             plugins: {
