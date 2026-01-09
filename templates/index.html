@@ -404,7 +404,7 @@
             width: 100%;
         }
 
-                /* --- MOBILE OPTIMIZATIONS (Refined for Spacing) --- */
+        /* --- MOBILE OPTIMIZATIONS (Refined for Spacing) --- */
         @media (max-width: 768px) {
             body {
                 padding: 30px 15px;
@@ -455,7 +455,7 @@
                 height: 280px;
                 margin-top: 15px;
             }
-            
+
             .metric-card.flex-row {
                 flex-direction: column !important;
                 text-align: center !important;
@@ -543,7 +543,8 @@
                                     </div>
                                     <small class="text-muted">Tingkat kesibukan server</small>
                                 </div>
-                                <span class="metric-val" style="font-size: 2rem; color: var(--text-primary);">{{ results.rho }} ({{ results.rho_percent }}%)</span>
+                                <span class="metric-val" style="font-size: 2rem; color: var(--text-primary);">{{
+                                    results.rho }} ({{ results.rho_percent }}%)</span>
                             </div>
                         </div>
 
@@ -620,7 +621,8 @@
                                             <li class="mb-2"><strong>λ (Laju Kedatangan)</strong> = 1 ÷
                                                 {{ results.input_arrival }} <br> → <span class="formula">λ =
                                                     {{ results.lam }} pelanggan/menit</span></li>
-                                            <li><strong>μ (Laju Pelayanan)</strong> = 1 ÷ {{ results.input_service }} <br>
+                                            <li><strong>μ (Laju Pelayanan)</strong> = 1 ÷ {{ results.input_service }}
+                                                <br>
                                                 → <span class="formula">μ = {{ results.mu }} pelanggan/menit</span></li>
                                         </ul>
                                     </div>
@@ -634,7 +636,8 @@
                                             Rumus: <span class="formula">ρ = λ ÷ (2 × μ)</span><br><br>
                                             Substitusi: ρ = {{ results.lam }} ÷ (2 × {{ results.mu }})<br>
                                             Hitung: ρ = {{ results.lam }} ÷ {{ results.calc_2mu }}<br>
-                                            <strong>Hasil: ρ = {{ results.rho }} (atau {{ results.rho_percent }}%)</strong>
+                                            <strong>Hasil: ρ = {{ results.rho }} (atau {{ results.rho_percent
+                                                }}%)</strong>
                                         </div>
                                     </div>
 
@@ -661,7 +664,8 @@
                                         <div class="bg-light p-3 rounded">
                                             Rumus: <span class="formula">Wq = λ² ÷ [2μ(μ - λ/2)]</span><br><br>
                                             Pembilang (Atas): {{ results.lam }}² = {{ results.lam_sq }}<br>
-                                            Penyebut (Bawah): 2({{ results.mu }}) × ({{ results.calc_denom }}) = {{ (results.calc_2mu * results.calc_denom)|round(5) }}<br>
+                                            Penyebut (Bawah): 2({{ results.mu }}) × ({{ results.calc_denom }}) = {{
+                                            (results.calc_2mu * results.calc_denom)|round(5) }}<br>
                                             Hitung: Wq = {{ results.lam_sq }} ÷ {{ (results.calc_2mu *
                                             results.calc_denom)|round(5) }}<br>
                                             <strong>Hasil: Wq = {{ results.wq }} Menit</strong>
@@ -675,11 +679,13 @@
                                         <div class="bg-light p-3 rounded">
                                             <p class="mb-2">
                                                 <strong>L (Jumlah orang di sistem):</strong> λ × W <br>
-                                                {{ results.lam }} × {{ results.w }} = <strong>{{ results.l }} Orang</strong>
+                                                {{ results.lam }} × {{ results.w }} = <strong>{{ results.l }}
+                                                    Orang</strong>
                                             </p>
                                             <p class="mb-0">
                                                 <strong>Lq (Jumlah orang antri):</strong> λ × Wq <br>
-                                                {{ results.lam }} × {{ results.wq }} = <strong>{{ results.lq }} Orang</strong>
+                                                {{ results.lam }} × {{ results.wq }} = <strong>{{ results.lq }}
+                                                    Orang</strong>
                                             </p>
                                         </div>
                                     </div>
@@ -740,7 +746,8 @@
                                                             class="fas fa-dot-circle text-warning me-1"></i> Titik
                                                         Kuning:</strong> Posisi sistem Anda saat ini berdasarkan input
                                                     yang Anda masukkan. Titik ini menunjukkan di mana λ
-                                                    ({{ results.lam }}) memotong kurva M/M/2 pada waktu W ({{ results.w }}).
+                                                    ({{ results.lam }}) memotong kurva M/M/2 pada waktu W ({{ results.w
+                                                    }}).
                                                 </p>
                                                 <p class="mb-0 mt-2 text-muted italic"><em>Catatan: Menambahkan 1
                                                         pelayan tambahan (dari M/M/1 ke M/M/2) secara signifikan
@@ -770,7 +777,8 @@
                             <div class="metric-card py-2">
                                 <div class="d-flex justify-content-between align-items-center px-3">
                                     <span class="fw-bold" style="color: var(--muted-text);">Intensitas Trafik (ρ)</span>
-                                    <span class="metric-val text-danger" style="font-size: 1.5rem;">{{ mm1_results.rho }}</span>
+                                    <span class="metric-val text-danger" style="font-size: 1.5rem;">{{ mm1_results.rho
+                                        }}</span>
                                 </div>
                             </div>
                         </div>
@@ -884,7 +892,8 @@
         {% if results %}
         try {
             const ctx = document.getElementById('performanceChart').getContext('2d');
-            const currentLambda = {{ results.lam }};
+            const currentLambda = {{ results.lam }
+        };
         const mu = {{ results.mu }};
 
         const labels = [];
@@ -928,7 +937,7 @@
                     },
                     {
                         label: 'Posisi Saat Ini',
-                        data: labels.map(l => (Math.abs(l - currentLambda) < step / 2) ? {{ results.w }} : null),
+                        data: labels.map(l => (Math.abs(parseFloat(l) - currentLambda) < step * 0.6) ? {{ results.w }} : null),
             borderColor: '#f1c40f',
                 backgroundColor: '#f1c40f',
                     pointRadius: 6,
@@ -950,7 +959,7 @@
                 },
                 y: {
                     title: { display: true, text: 'Waktu (W)' },
-                    suggestedMax: {{ results.w * 2 }}
+                    suggestedMax: { { results.w * 2 } }
                 }
             },
             plugins: {
