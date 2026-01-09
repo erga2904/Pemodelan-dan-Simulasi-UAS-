@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Teori Antrian - M/M/2 & M/M/1</title>
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* --- STYLE FIX TIDAK DIUBAH --- */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.3);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --body-bg: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+            --text-primary: #2b5876;
+            --text-secondary: #4e4376;
+            --text-dark: #1a1a1a;
+            --input-bg: rgba(255, 255, 255, 0.45);
+            --card-bg: #ffffff;
+            --result-panel-bg: rgba(255, 255, 255, 0.55);
+            --btn-bg: #2b5876;
+            --btn-hover: #4e4376;
+            --step-bg: rgba(255, 255, 255, 0.6);
+            --accordion-bg: rgba(255, 255, 255, 0.7);
+            --metric-val-color: #2b5876;
+            --muted-text: #7f8c8d;
+        }
+
+        [data-theme="dark"] {
+            --glass-bg: rgba(20, 20, 20, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+            --body-bg: linear-gradient(120deg, #000000 0%, #1a1a1a 100%);
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-dark: #ffffff;
+            --input-bg: rgba(40, 40, 40, 0.7);
+            --card-bg: #1e1e1e;
+            --result-panel-bg: rgba(30, 30, 30, 0.6);
+            --btn-bg: #ffffff;
+            --btn-hover: #e0e0e0;
+            --step-bg: rgba(30, 30, 30, 0.8);
+            --accordion-bg: rgba(30, 30, 30, 0.7);
+            --metric-val-color: #ffffff;
+            --muted-text: #aaaaaa;
+        }
+
+        body {
+            font-family: 'Figtree', sans-serif;
+            background: var(--body-bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 15px;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        .glass-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--glass-shadow);
+            padding: 40px;
+            width: 100%;
+            max-width: 900px;
+            position: relative;
+            transition: background 0.5s ease, border 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .glass-input {
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            border-radius: 12px;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: 0.3s;
+            color: var(--text-dark);
+        }
+
+        .glass-input:focus {
+            outline: none;
+            background: white;
+            border-color: var(--text-primary);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="dark"] .glass-input:focus {
+            background: #1e293b;
+            color: white;
+        }
+
+        .btn-modern {
+            background: var(--btn-bg);
+            color: white;
+            padding: 15px;
+            width: 100%;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        [data-theme="dark"] .btn-modern {
+            color: #000;
+        }
+
+        .btn-modern:hover {
+            background: var(--btn-hover);
+            transform: translateY(-2px);
+        }
+
+        .result-panel {
+            background: var(--result-panel-bg);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 30px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .nav-pills .nav-link {
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.1);
+            margin-right: 10px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .nav-pills .nav-link.active {
+            background: var(--btn-bg);
+            color: white;
+        }
+
+        [data-theme="dark"] .nav-pills .nav-link.active {
+            color: #000;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            height: 100%;
+            transition: transform 0.2s, background 0.5s ease, border 0.5s ease;
+            position: relative;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .metric-val {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--metric-val-color);
+            line-height: 1.2;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--muted-text);
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+        }
+
+        .accordion-item {
+            background: transparent !important;
+            border: none !important;
+        }
+
+        .accordion-button {
+            background: var(--accordion-bg) !important;
+            font-weight: 600;
+            color: var(--text-primary) !important;
+            box-shadow: none !important;
+        }
+
+        .accordion-button:focus {
+            box-shadow: none !important;
+            outline: none !important;
+        }
+
+        [data-theme="dark"] .accordion-button {
+            background: #1a1a1a !important;
+            color: #ffffff !important;
+        }
+
+        [data-theme="dark"] .accordion-button:not(.collapsed) {
+            background: #2a2a2a !important;
+            color: #ffffff !important;
+        }
+
+        .accordion-body {
+            background: var(--glass-bg);
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            color: var(--text-dark);
+        }
+
+        [data-theme="dark"] .accordion-button::after {
+            filter: invert(1) grayscale(1) brightness(2) !important;
+        }
+
+        /* Icon & Popover Styles */
+        .info-icon {
+            color: var(--text-secondary);
+            cursor: help;
+            margin-left: 5px;
+            font-size: 14px;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+
+        .info-icon:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        /* Fix Accordion Chevron in Dark Mode */
+        /* Removed redundant [data-theme="dark"] .accordion-button:not(.collapsed)::after as it's covered by the general rule */
+
+        .popover {
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            font-family: 'Figtree', sans-serif;
+        }
+
+        .popover-header {
+            background-color: var(--btn-bg);
+            color: white;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            font-weight: 700;
+            border-bottom: none;
+        }
+
+        [data-theme="dark"] .popover-header {
+            color: #000;
+        }
+
+        .popover-body {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            background: var(--card-bg);
+            line-height: 1.4;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .glass-input::placeholder {
+            color: rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="dark"] .glass-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Style tambahan untuk langkah pengerjaan */
+        .step-box {
+            background: var(--step-bg);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--text-primary);
+            color: var(--text-dark);
+        }
+
+        .formula {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #c0392b;
+        }
+
+        [data-theme="dark"] .formula {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="dark"] .bg-light {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            color: var(--text-dark);
+        }
+
+        [data-theme="dark"] .badge.bg-primary {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }
+
+        [data-theme="dark"] .text-primary {
+            color: #ffffff !important;
+        }
+
+        [data-theme="dark"] .border-primary {
+            border-color: #ffffff !important;
+        }
+
+        [data-theme="dark"] .border-info {
+            border-color: #888888 !important;
+        }
+
+        [data-theme="dark"] .border-danger {
+            border-color: #ffffff !important;
+        }
+
+        [data-theme="dark"] .text-danger {
+            color: #ffffff !important;
+        }
+
+        [data-theme="dark"] .text-muted {
+            color: var(--muted-text) !important;
+        }
+
+        [data-theme="dark"] .alert-warning {
+            background-color: #1a1a1a !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        [data-theme="dark"] .alert-info {
+            background-color: #1a1a1a !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        [data-theme="dark"] .alert-danger {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+            border: 1px solid #ffffff !important;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+        }
+
+        .theme-toggle i {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            background: var(--text-primary);
+            color: #000;
+        }
+
+        [data-theme="light"] .theme-toggle:hover {
+            color: #fff;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Chart Styling */
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="glass-container">
+        <button class="theme-toggle" id="themeToggle" title="Ganti Tema">
+            <i class="fas fa-moon"></i>
+        </button>
+        <div class="text-center mb-4">
+            <h2 style="font-weight: 800; color: var(--text-primary);">Kalkulator Teori Antrian</h2>
+            <p style="color: var(--text-secondary);">Simulasi M/M/2 (Tugas Utama) & Perbandingan M/M/1</p>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-danger border-0 rounded-3 shadow-sm">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" autocomplete="off">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="fw-bold mb-2" style="color: var(--text-dark);"><i class="far fa-clock me-1"></i> Waktu
+                        Kedatangan (1/λ)</label>
+                    <!-- Logic: Input kosong di awal -->
+                    <input type="number" step="0.01" class="glass-input" name="arrival_time" placeholder="Contoh: 4.0"
+                        value="{{ results.input_arrival if results else '' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="fw-bold mb-2" style="color: var(--text-dark);"><i class="fas fa-tools me-1"></i> Waktu
+                        Pelayanan (1/μ)</label>
+                    <!-- Logic: Input kosong di awal -->
+                    <input type="number" step="0.01" class="glass-input" name="service_time" placeholder="Contoh: 3.0"
+                        value="{{ results.input_service if results else '' }}" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-modern mt-4"><i class="fas fa-calculator me-2"></i> Hitung Metrik</button>
+        </form>
+
+        {% if results %}
+        <div class="result-panel">
+
+            <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="pills-mm2-tab" data-bs-toggle="pill" data-bs-target="#pills-mm2"
+                        type="button" role="tab">
+                        <i class="fas fa-users-cog me-2"></i>Hasil M/M/2 (Tugas)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-mm1-tab" data-bs-toggle="pill" data-bs-target="#pills-mm1"
+                        type="button" role="tab">
+                        <i class="fas fa-user-tie me-2"></i>Hasil M/M/1 (Banding)
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="pills-tabContent">
+
+                <!-- KONTEN TAB 1: M/M/2 (UTAMA) -->
+                <div class="tab-pane fade show active" id="pills-mm2" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0" style="color: var(--text-dark);">Statistik 2 Pelayan (Server)</h5>
+                        <span class="badge bg-primary rounded-pill">Model Tugas</span>
+                    </div>
+
+                    <!-- Hasil Card Tetap Sama -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <div class="metric-card d-flex align-items-center justify-content-between px-4 flex-row"
+                                style="text-align: left;">
+                                <div>
+                                    <div style="font-weight: 700; color: var(--text-primary); font-size: 1.2rem;">
+                                        Intensitas Trafik (ρ)
+                                        <i class="fas fa-question-circle info-icon" data-bs-toggle="popover"
+                                            data-bs-placement="top" data-bs-trigger="hover focus"
+                                            title="Intensitas Trafik (ρ)"
+                                            data-bs-content="Maksud: Tingkat kesibukan server. Jika bernilai 0.375 artinya server hanya sibuk 37.5% dari total waktu kerja."></i>
+                                    </div>
+                                    <small class="text-muted">Tingkat kesibukan server</small>
+                                </div>
+                                <span class="metric-val" style="font-size: 2rem; color: var(--text-primary);">{{
+                                    results.rho }} ({{ results.rho_percent }}%)</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="metric-card border-bottom border-primary border-4">
+                                <div class="metric-val">{{ results.w }}</div>
+                                <div class="metric-label">
+                                    Waktu di Sistem (W)
+                                    <i class="fas fa-question-circle info-icon" data-bs-toggle="popover"
+                                        data-bs-trigger="hover focus" title="Total Waktu (W)"
+                                        data-bs-content="Waktu rata-rata total yang dihabiskan pelanggan (mulai antri sampai selesai dilayani)."></i>
+                                    <br><small class="text-muted">(Menit)</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="metric-card border-bottom border-info border-4">
+                                <div class="metric-val">{{ results.wq }}</div>
+                                <div class="metric-label">
+                                    Waktu Antri (Wq)
+                                    <i class="fas fa-question-circle info-icon" data-bs-toggle="popover"
+                                        data-bs-trigger="hover focus" title="Waktu Antrian (Wq)"
+                                        data-bs-content="Waktu yang dihabiskan pelanggan hanya untuk MENUNGGU sebelum dilayani."></i>
+                                    <br><small class="text-muted">(Menit)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="metric-card">
+                                <div class="metric-val" style="color: var(--text-dark);">{{ results.l }}</div>
+                                <div class="metric-label">
+                                    Pelanggan di Sistem (L)
+                                    <i class="fas fa-question-circle info-icon" data-bs-toggle="popover"
+                                        data-bs-trigger="hover focus" title="Jumlah Orang di Sistem"
+                                        data-bs-content="Rata-rata banyaknya orang di dalam kantor (Antri + Dilayani)."></i>
+                                    <br><small class="text-muted">(Orang)</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="metric-card">
+                                <div class="metric-val" style="color: var(--text-dark);">{{ results.lq }}</div>
+                                <div class="metric-label">
+                                    Pelanggan Antri (Lq)
+                                    <i class="fas fa-question-circle info-icon" data-bs-toggle="popover"
+                                        data-bs-trigger="hover focus" title="Jumlah Orang Antri"
+                                        data-bs-content="Rata-rata banyaknya orang yang sedang mengantri saja."></i>
+                                    <br><small class="text-muted">(Orang)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bagian DETAIL PENGERJAAN MANUAL (Updated) -->
+                    <div class="accordion step-accordion" id="accSteps">
+                        <div class="accordion-item shadow-sm border-0 rounded-3 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseOne">
+                                    <i class="fas fa-book-open me-2"></i> Lihat Langkah Pengerjaan Detail & Rumus
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accSteps">
+                                <div class="accordion-body">
+
+                                    <!-- Step 1 -->
+                                    <div class="step-box">
+                                        <h6 class="fw-bold"><i class="fas fa-hourglass-start me-2"></i>1. Mengubah Waktu
+                                            menjadi Laju (Rate)</h6>
+                                        <p class="mb-1 text-muted small">Kita perlu tahu berapa pelanggan yang datang
+                                            per menit.</p>
+                                        <ul class="list-unstyled bg-light p-3 rounded mb-0">
+                                            <li class="mb-2"><strong>λ (Laju Kedatangan)</strong> = 1 ÷
+                                                {{results.input_arrival}} <br> → <span class="formula">λ =
+                                                    {{results.lam}} pelanggan/menit</span></li>
+                                            <li><strong>μ (Laju Pelayanan)</strong> = 1 ÷ {{results.input_service}} <br>
+                                                → <span class="formula">μ = {{results.mu}} pelanggan/menit</span></li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Step 2 -->
+                                    <div class="step-box">
+                                        <h6 class="fw-bold"><i class="fas fa-server me-2"></i>2. Menghitung Pemanfaatan
+                                            Server (ρ)</h6>
+                                        <p class="mb-1 text-muted small">Mengukur seberapa sibuk kedua pelayan.</p>
+                                        <div class="bg-light p-3 rounded">
+                                            Rumus: <span class="formula">ρ = λ ÷ (2 × μ)</span><br><br>
+                                            Substitusi: ρ = {{results.lam}} ÷ (2 × {{results.mu}})<br>
+                                            Hitung: ρ = {{results.lam}} ÷ {{results.calc_2mu}}<br>
+                                            <strong>Hasil: ρ = {{results.rho}} (atau {{results.rho_percent}}%)</strong>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 3 -->
+                                    <div class="step-box">
+                                        <h6 class="fw-bold"><i class="fas fa-clock me-2"></i>3. Waktu Rata-rata di
+                                            Sistem (W)</h6>
+                                        <p class="mb-1 text-muted small">Waktu total pelanggan berada di tempat layanan.
+                                        </p>
+                                        <div class="bg-light p-3 rounded">
+                                            Rumus: <span class="formula">W = 1 ÷ (μ - (λ ÷ 2))</span><br><br>
+                                            Substitusi: W = 1 ÷ ({{results.mu}} - ({{results.lam}} ÷ 2))<br>
+                                            Proses: W = 1 ÷ ({{results.mu}} - {{(results.lam / 2)|round(4)}})<br>
+                                            Proses: W = 1 ÷ {{results.calc_denom}}<br>
+                                            <strong>Hasil: W = {{results.w}} Menit</strong>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 4 -->
+                                    <div class="step-box">
+                                        <h6 class="fw-bold"><i class="fas fa-user-clock me-2"></i>4. Waktu Rata-rata di
+                                            Antrian (Wq)</h6>
+                                        <p class="mb-1 text-muted small">Waktu pelanggan menunggu sebelum dipanggil.</p>
+                                        <div class="bg-light p-3 rounded">
+                                            Rumus: <span class="formula">Wq = λ² ÷ [2μ(μ - λ/2)]</span><br><br>
+                                            Pembilang (Atas): {{results.lam}}² = {{results.lam_sq}}<br>
+                                            Penyebut (Bawah): 2({{results.mu}}) × ({{results.calc_denom}}) = {{
+                                            (results.calc_2mu * results.calc_denom)|round(5) }}<br>
+                                            Hitung: Wq = {{results.lam_sq}} ÷ {{ (results.calc_2mu *
+                                            results.calc_denom)|round(5) }}<br>
+                                            <strong>Hasil: Wq = {{results.wq}} Menit</strong>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 5 -->
+                                    <div class="step-box mb-0">
+                                        <h6 class="fw-bold"><i class="fas fa-users me-2"></i>5. Menghitung Jumlah Orang
+                                            (Hukum Little)</h6>
+                                        <div class="bg-light p-3 rounded">
+                                            <p class="mb-2">
+                                                <strong>L (Jumlah orang di sistem):</strong> λ × W <br>
+                                                {{results.lam}} × {{results.w}} = <strong>{{results.l}} Orang</strong>
+                                            </p>
+                                            <p class="mb-0">
+                                                <strong>Lq (Jumlah orang antri):</strong> λ × Wq <br>
+                                                {{results.lam}} × {{results.wq}} = <strong>{{results.lq}} Orang</strong>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item shadow-sm border-0 rounded-3 overflow-hidden mt-3">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseGraph">
+                                    <i class="fas fa-chart-line me-2"></i> Visualisasi Grafik Performa (W vs λ)
+                                </button>
+                            </h2>
+                            <div id="collapseGraph" class="accordion-collapse collapse" data-bs-parent="#accSteps">
+                                <div class="accordion-body">
+                                    <div class="chart-container">
+                                        <canvas id="performanceChart"></canvas>
+                                    </div>
+                                    <p class="mt-3 small text-muted text-center">
+                                        Grafik menunjukkan perbandingan Waktu di Sistem (W) seiring bertambahnya Laju
+                                        Kedatangan (λ).
+                                        <br>
+                                        <span class="badge bg-primary" id="mm2-badge">Biru: M/M/2</span>
+                                        <span class="badge bg-danger">Merah: M/M/1</span>
+                                    </p>
+
+                                    <!-- Penjelasan Detail Grafik -->
+                                    <div class="mt-4 p-3 rounded-3"
+                                        style="background: rgba(var(--text-primary-rgb), 0.05); border: 1px solid var(--glass-border);">
+                                        <h6 class="fw-bold mb-3"><i class="fas fa-info-circle me-2"></i>Panduan Membaca
+                                            Grafik</h6>
+                                        <div class="row g-3 small">
+                                            <div class="col-md-6 border-end">
+                                                <p class="mb-2"><strong>1. Interpretasi Sumbu:</strong></p>
+                                                <ul>
+                                                    <li><strong>Sumbu X (λ):</strong> Semakin ke kanan, pelanggan datang
+                                                        semakin sering (laju tinggi).</li>
+                                                    <li><strong>Sumbu Y (W):</strong> Semakin ke atas, waktu yang
+                                                        dihabiskan pelanggan di sistem semakin lama.</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-2"><strong>2. Analisis Garis:</strong></p>
+                                                <ul>
+                                                    <li><strong class="text-primary" id="mm2-guide-text">Garis Biru
+                                                            (M/M/2):</strong>
+                                                        Menunjukkan bahwa dengan 2 pelayan, kenaikan waktu tunggu jauh
+                                                        lebih landai dan stabil.</li>
+                                                    <li><strong class="text-danger">Garis Putus Merah (M/M/1):</strong>
+                                                        Menunjukkan lonjakan waktu yang sangat tajam saat λ mendekati μ.
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-12 mt-2 pt-2 border-top">
+                                                <p class="mb-1"><strong><i
+                                                            class="fas fa-dot-circle text-warning me-1"></i> Titik
+                                                        Kuning:</strong> Posisi sistem Anda saat ini berdasarkan input
+                                                    yang Anda masukkan. Titik ini menunjukkan di mana λ
+                                                    ({{results.lam}}) memotong kurva M/M/2 pada waktu W ({{results.w}}).
+                                                </p>
+                                                <p class="mb-0 mt-2 text-muted italic"><em>Catatan: Menambahkan 1
+                                                        pelayan tambahan (dari M/M/1 ke M/M/2) secara signifikan
+                                                        "menekan" grafik ke bawah, memberikan keamanan extra terhadap
+                                                        antrian panjang yang tak terduga.</em></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KONTEN TAB 2: M/M/1 (PEMBANDING) -->
+                <div class="tab-pane fade" id="pills-mm1" role="tabpanel">
+                    {% if mm1_results and mm1_results.status == 'Stable' %}
+                    <h5 class="fw-bold mb-3" style="color: var(--text-dark);">Jika Menggunakan 1 Pelayan Saja (M/M/1)
+                    </h5>
+                    <div class="alert alert-warning py-2 small shadow-sm">
+                        <i class="fas fa-exclamation-triangle me-1"></i> Perbandingan: Dengan 1 pelayan, waktu tunggu
+                        akan meningkat drastis.
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <div class="metric-card py-2">
+                                <div class="d-flex justify-content-between align-items-center px-3">
+                                    <span class="fw-bold" style="color: var(--muted-text);">Intensitas Trafik (ρ)</span>
+                                    <span class="metric-val text-danger" style="font-size: 1.5rem;">{{ mm1_results.rho
+                                        }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="metric-card border-top border-danger border-4">
+                                <div class="metric-val text-danger fs-3">{{ mm1_results.w }}</div>
+                                <div class="metric-label" style="font-size: 0.7rem;">W (Sistem)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="metric-card border-top border-danger border-4">
+                                <div class="metric-val text-danger fs-3">{{ mm1_results.wq }}</div>
+                                <div class="metric-label" style="font-size: 0.7rem;">Wq (Antrian)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="metric-card">
+                                <div class="metric-val fs-3">{{ mm1_results.l }}</div>
+                                <div class="metric-label" style="font-size: 0.7rem;">L (Org)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="metric-card">
+                                <div class="metric-val fs-3">{{ mm1_results.lq }}</div>
+                                <div class="metric-label" style="font-size: 0.7rem;">Lq (Org)</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-danger mt-3 shadow-sm">
+                        <h5 class="alert-heading fw-bold"><i class="fas fa-skull-crossbones me-2"></i>Sistem Tidak
+                            Stabil!</h5>
+                        <p class="mb-0">Jika hanya menggunakan 1 pelayan (M/M/1), antrian akan menjadi tak terhingga
+                            karena Laju Kedatangan (λ={{results.lam}}) mendekati atau melebihi Kapasitas Pelayanan
+                            (μ={{results.mu}}).</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+        {% endif %}
+
+        <footer class="text-center mt-5" style="font-size: 0.8rem; color: var(--text-dark); opacity: 0.6;">
+            <p class="mb-0 fw-bold">Tugas Pemodelan & Simulasi</p>
+            <small>Aplikasi Flask - Model M/M/2 dengan Pilihan M/M/1</small>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+        const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const icon = themeToggle.querySelector('i');
+
+        // Check saved preference
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            htmlElement.setAttribute('data-theme', 'dark');
+            icon.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        let chart = null;
+
+        function updateChartTheme() {
+            if (!chart) return;
+            const isDark = document.documentElement.hasAttribute('data-theme');
+            const color = isDark ? '#ffffff' : '#1a1a1a';
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+            const mm2Color = isDark ? '#ffffff' : '#2b5876';
+
+            // Update Chart Scales
+            chart.options.scales.x.ticks.color = color;
+            chart.options.scales.y.ticks.color = color;
+            chart.options.scales.x.title.color = color;
+            chart.options.scales.y.title.color = color;
+            chart.options.scales.x.grid.color = gridColor;
+            chart.options.scales.y.grid.color = gridColor;
+
+            // Update MM2 Dataset Color
+            chart.data.datasets[0].borderColor = mm2Color;
+            chart.data.datasets[0].backgroundColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(43, 88, 118, 0.1)';
+
+            // Update Text Labels
+            const mm2Badge = document.getElementById('mm2-badge');
+            const mm2Guide = document.getElementById('mm2-guide-text');
+
+            if (mm2Badge) {
+                mm2Badge.textContent = isDark ? 'Putih: M/M/2' : 'Biru: M/M/2';
+            }
+            if (mm2Guide) {
+                mm2Guide.textContent = isDark ? 'Garis Putih (M/M/2):' : 'Garis Biru (M/M/2):';
+            }
+
+            chart.update();
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = htmlElement.hasAttribute('data-theme');
+            if (isDark) {
+                htmlElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                icon.classList.replace('fa-sun', 'fa-moon');
+            } else {
+                htmlElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                icon.classList.replace('fa-moon', 'fa-sun');
+            }
+            updateChartTheme();
+        });
+
+        // Chart Logic
+        {% if results %}
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const currentLambda = {{ results.lam }};
+        const mu = {{ results.mu }};
+
+        // Generate data for graph
+        const labels = [];
+        const dataMM2 = [];
+        const dataMM1 = [];
+
+        // Max lambda for plot: 90% of 2*mu
+        const maxLambda = mu * 1.9;
+        const step = maxLambda / 40;
+
+        for (let l = 0.01; l <= maxLambda; l += step) {
+            labels.push(l.toFixed(2));
+
+            // M/M/2 formula: W = 1 / (mu - lambda/2)
+            const w2 = 1 / (mu - (l / 2));
+            dataMM2.push(l >= 2 * mu ? null : w2);
+
+            // M/M/1 formula: W = 1 / (mu - lambda)
+            const w1 = 1 / (mu - l);
+            dataMM1.push(l >= mu ? null : w1);
+        }
+
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'M/M/2 (W)',
+                        data: dataMM2,
+                        borderColor: '#2b5876',
+                        backgroundColor: 'rgba(43, 88, 118, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'M/M/1 (W)',
+                        data: dataMM1,
+                        borderColor: '#e74c3c',
+                        borderDash: [5, 5],
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.4,
+                        fill: false
+                    },
+                    {
+                        label: 'Posisi Saat Ini',
+                        data: labels.map(l => (Math.abs(l - currentLambda) < step / 2) ? {{ results.w }} : null),
+            borderColor: '#f1c40f',
+                backgroundColor: '#f1c40f',
+                    pointRadius: 6,
+                        pointHoverRadius: 8,
+                            showLine: false
+                    }
+                ]
+            },
+        options: {
+            responsive: true,
+                maintainAspectRatio: false,
+                    interaction: {
+                intersect: false,
+                    mode: 'index'
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: 'Laju Kedatangan (λ)' }
+                },
+                y: {
+                    title: { display: true, text: 'Waktu (W)' },
+                    suggestedMax: {{ results.w * 2 }}
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+        });
+
+        // Initial theme call for chart
+        updateChartTheme();
+        {% endif %}
+    </script>
+
+</body>
+
+</html>
